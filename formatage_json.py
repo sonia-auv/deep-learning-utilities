@@ -3,7 +3,9 @@ import xml.etree.cElementTree as xml
 import os
 import json
 import sys
+from matplotlib import collections
 import matplotlib.pyplot as plt # 2D plotting library
+import numpy as np
 
 def info_directory (path) :
     '''
@@ -100,35 +102,98 @@ def recursive_search_and_JSON_file_generator (path, overwrite):
                 with open(os.path.join(root, name,"data.json"), 'w', encoding='utf-8') as f:
                     json.dump(data, f, ensure_ascii=False, indent=4)
 
+def get_number_of_images_in_categories (JSON_categories) :
+    '''
+        It returns the number of 'format' of images from a JSON of categories
+    '''
+    list_of_images_format = ['.PNG', '.JPG']
+    total_of_images = 0
+    for i in range(len(JSON_categories)):
+        if JSON_categories[i]["format"].upper() in list_of_images_format:
+            total_of_images += JSON_categories[i]["nombre"]
+    return (total_of_images)
+
 def JSON_categories_plot (JSON_file):
     '''
-        Print a graph with the total images separated by types
+        Print a bar plot with classes. Each class is the place where the photos where shot.
+        For each class, we plot the number of photos by type.
     '''
+    info = dict()
     types = []
-    number_of_types = []
+    places = []
+
+    # Get all the types and places of the data
     for desc in JSON_file :
+        types += desc.get('type')
+        places += desc.get('lieu')
+
+    # Initialize the dictionnary info to items which each key is a place and his value a dict {}
+    for place in places:
+        info[place] = dict()
+
+    # For each place in the dictionnary info, we initialize to 0 the number of types.
+    for place in places:
+        info[place] = np.zeros(len(types))
+
+    # We try to find the number of types to add to the dic info (for each place and for each type).
+    for desc in JSON_file :
+        types_found, places_found, number_of_images = [], [], 0
         for details in desc.items() :
-            if ((desc[0] == 'type') and (not(desc[0] in types))):
-                desc[0] += types
-            if (desc[0] == 'categories'):
-                for format in desc[1]:
-                    print (format)
-                    # if detail_format in '.jpg'
-                    # number_of_types += 1
-            #categories += [{"format": cat[0], "nombre":cat[1]}]
-            #number_of_types += contenu.keys('format')
-            #types += contenu["types"]
-    datatest = [5000, 1, 2]
-    labels = ['A', 'B', 'C']
-    try :
-        1/0
-        plt.figure(figsize=(8, 8))
-        plt.plot(range(len(datatest)), datatest, color='blue')
-        plt.xticks(range(len(datatest)), labels, rotation='vertical')
-        plt.title('Histogram of the data classified by type')
-        plt.show()
-    except :
-        print ("There is an error !")
+            if (isinstance(details[1], list)):
+                if (details[0] == 'type'):                
+                    types_found = details[1]
+                elif (details[0] == 'lieu'):                
+                    places_found = details[1]
+                elif (details[0] == 'categories'):                
+                    number_of_images = get_number_of_images_in_categories(details[1])
+                else:
+                    pass 
+        for place in places_found:
+            for type in types_found:
+                info[place][types.index(type)] += number_of_images
+
+# test
+    # CMV = [5000, 1, 200]
+    # Alex = [500, 100, 0]
+
+    # affichage d'un nuage de points
+    # try :
+    #     1/0
+    #     plt.figure(figsize=(8, 8))
+    #     for i in range(len(CMV)):
+    #         plt.scatter(labels_CMV[i], CMV[i], color='blue')
+    #     for i in range(len(Alex)):
+    #         plt.scatter(labels_Alex[i], Alex[i], color='red')
+    #     # plt.plot(range(len(CMV)), CMV, color='blue')
+    #     # plt.plot(range(len(Alex)), Alex, color='red')
+    #     plt.legend(["CMV", "Alex"])
+    #     plt.xticks(range(len(CMV)), labels_CMV, rotation='vertical')
+    #     plt.title('Histogram of the data classified by type')
+    #     plt.show()
+    # except :
+    #     print ("Not selected")
+
+    # Affichage de bars (plus "propre")
+
+    width = 0.35  # the width of the bars
+    x = np.arange(len(types))  # the label locations
+    fig, ax = plt.subplots()
+    rects = []
+    placement = - width*(len(places)-1)/2
+    for i in range(len(places)):
+        rects += [ax.bar(x + placement, info[places[i]], width, label=places[i])]
+        print (placement)
+        ax.bar_label(rects[(len(rects)-1)], padding=3)
+        placement += width
+
+    # Add some text for labels, title and custom x-axis tick labels, etc.
+    ax.set_ylabel('Scores')
+    ax.set_title('Scores by group and gender')
+    ax.set_xticks(x)
+    ax.set_xticklabels(types)
+    ax.legend()
+    fig.tight_layout()
+    plt.show()
 
 def menu(*list_of_menu_buttons):
     global data_JSON
@@ -146,11 +211,14 @@ def menu(*list_of_menu_buttons):
                         \t3 - get all JSON files found recursively from .
                         \t4 - plot statistics from the JSON files.
                         \t5 - print the JSON files found by the third menu.
-                        \t6 - END of the program.
+                        \t6 - print the absolute path of the script.
+                        \t7 - END of the program.
                     """)
-        val = int(input())
+        try:
+            val = int(input())
+        except:
+            print ("Please enter an integer ! ")
     if (val == 1):
-        # recursively research of directories
         recursive_search_and_JSON_file_generator(".", 1)
     elif (val == 2):
         recursive_search_and_JSON_file_generator(".", 0)
@@ -161,11 +229,12 @@ def menu(*list_of_menu_buttons):
     elif (val == 5):
         print (json.dumps(data_JSON, indent=4))
     elif (val == 6):
+        print (os.getcwd())
+    elif (val == 7):
         exit ()
     else :
-        print ("Your choice must be an integer between 1 and 6 !")
-    # recall the menu at the end of the task.
-    menu(list_of_menu_buttons)
+        print ("Your choice must be an integer between 1 and 7 !")
+    menu(list_of_menu_buttons) # recall the menu at the end of the task.
 
 def main (arguments) :
     menu(arguments) # call the menu which is a switch-case of functions.
@@ -182,7 +251,8 @@ if (__name__ == "__main__"):
             arguments[i] = int(arguments[i])
         except ValueError:
             print("Could not convert argument to an integer.")
+            exit(1)
         except:
             print("Unexpected error:", sys.exc_info()[0])
-            raise
+            exit(1)
     main(arguments)
