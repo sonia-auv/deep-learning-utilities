@@ -1,9 +1,7 @@
 # -*-coding:UTF8 ISO-8859-1 -*
-import xml.etree.cElementTree as xml
 import os
 import json
 import sys
-from matplotlib import collections
 import matplotlib.pyplot as plt # 2D plotting library
 import numpy as np
 
