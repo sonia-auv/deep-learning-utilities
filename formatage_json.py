@@ -175,14 +175,13 @@ def JSON_categories_plot (JSON_file):
 
     # Affichage de bars (plus "propre")
 
-    width = 0.35  # the width of the bars
+    width = 0.2  # the width of the bars
     x = np.arange(len(types))  # the label locations
     fig, ax = plt.subplots()
     rects = []
     placement = - width*(len(places)-1)/2
     for i in range(len(places)):
         rects += [ax.bar(x + placement, info[places[i]], width, label=places[i])]
-        print (placement)
         ax.bar_label(rects[(len(rects)-1)], padding=3)
         placement += width
 
@@ -195,29 +194,35 @@ def JSON_categories_plot (JSON_file):
     fig.tight_layout()
     plt.show()
 
+def print_menu () :
+    '''
+        It prints the menu.
+    '''
+    print ("""\n\n Menu. Please, make a choice (or a sequence of choices).
+                    \t1 - create JSON files which contain info for each directory found recursively from . (overwrite existing JSON files)
+                    \t2 - create JSON files which contain info for each directory found recursively from . (if it does not already exist) 
+                    \t3 - get all JSON files found recursively from .
+                    \t4 - plot statistics from the JSON files.
+                    \t5 - print the JSON files found by the third menu.
+                    \t6 - print the absolute path of the script.
+                    \t7 - END of the program.
+                """)
+
 def menu(*list_of_menu_buttons):
     global data_JSON
     '''
         Function that prints a menu on the terminal.
         If we pass lists of commands : it do them without printed the menu.
     '''
-    list_of_menu_buttons = list_of_menu_buttons[0]
+    list_of_menu_buttons = list_of_menu_buttons[0] # enable to convert optional arguments of the function
     if list_of_menu_buttons != []: # Is there a sequence of executions to do ?
         val = list_of_menu_buttons.pop(0) # read the first element removed
     else : # Menu is printed and we wait the command prompt
-        print ("""\n\n Menu. Please, make a choice.
-                        \t1 - create JSON files which contain info for each directory found recursively from . (overwrite existing JSON files)
-                        \t2 - create JSON files which contain info for each directory found recursively from . (if it does not already exist) 
-                        \t3 - get all JSON files found recursively from .
-                        \t4 - plot statistics from the JSON files.
-                        \t5 - print the JSON files found by the third menu.
-                        \t6 - print the absolute path of the script.
-                        \t7 - END of the program.
-                    """)
-        try:
-            val = int(input())
-        except:
-            print ("Please enter an integer ! ")
+        print_menu()
+        list_of_menu_buttons = str(input()).split(' ') # We keep the string without spaces
+        list_of_menu_buttons = list(list_of_menu_buttons) # We store them in a list
+        list_of_menu_buttons = arguments_2_lists_of_integers(list_of_menu_buttons) # We convert them to a list of integers if possible
+        val = list_of_menu_buttons.pop(0)
     if (val == 1):
         recursive_search_and_JSON_file_generator(".", 1)
     elif (val == 2):
@@ -236,23 +241,31 @@ def menu(*list_of_menu_buttons):
         print ("Your choice must be an integer between 1 and 7 !")
     menu(list_of_menu_buttons) # recall the menu at the end of the task.
 
+def arguments_2_lists_of_integers (arguments) :
+    '''
+        It tests and converts a list of arguments received by the shell to convert to a
+        list of integers.
+        It raises an exception and exit if an argument is not standard.
+    '''
+    try :    
+        for i in range(len(arguments)):
+            arguments[i] = int(arguments[i])
+    except ValueError:
+        print("Could not convert argument to an integer.")
+        exit(1)
+    except:
+        print("Unexpected error:", sys.exc_info()[0])
+        exit(1)
+    return (arguments)
+
 def main (arguments) :
     menu(arguments) # call the menu which is a switch-case of functions.
 
 if (__name__ == "__main__"):
     '''
-        It forces python to execute the main fonction automatically.
         It read the arguments of the script, try to convert them to integer.
-        It executes the menu with the arguments.
+        It forces python to execute the main fonction automatically.
+        It executes the menu with the arguments (converted).
     '''
-    arguments = sys.argv[1:]
-    for i in range(len(arguments)):
-        try:
-            arguments[i] = int(arguments[i])
-        except ValueError:
-            print("Could not convert argument to an integer.")
-            exit(1)
-        except:
-            print("Unexpected error:", sys.exc_info()[0])
-            exit(1)
+    arguments = arguments_2_lists_of_integers(sys.argv[1:])
     main(arguments)
