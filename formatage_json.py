@@ -125,6 +125,9 @@ def JSON_categories_plot (JSON_file):
         types += desc.get('type')
         places += desc.get('lieu')
 
+    types = list(set(types))
+    places = list(set(places))
+
     # Initialize the dictionnary info to items which each key is a place and his value a dict {}
     for place in places:
         info[place] = dict()
@@ -150,42 +153,31 @@ def JSON_categories_plot (JSON_file):
             for type in types_found:
                 info[place][types.index(type)] += number_of_images
 
-# test
-    # CMV = [5000, 1, 200]
-    # Alex = [500, 100, 0]
+    # Compute the total of each types for each place
+    tableau = []
+    for index_type in range(len(types)):
+        sum = 0
+        for place in places:
+            sum += info[place][index_type]
+        tableau += [sum] # ajout d'une somme
+    info["TOTAL"] = tableau
+    places += ["TOTAL"]
 
-    # affichage d'un nuage de points
-    # try :
-    #     1/0
-    #     plt.figure(figsize=(8, 8))
-    #     for i in range(len(CMV)):
-    #         plt.scatter(labels_CMV[i], CMV[i], color='blue')
-    #     for i in range(len(Alex)):
-    #         plt.scatter(labels_Alex[i], Alex[i], color='red')
-    #     # plt.plot(range(len(CMV)), CMV, color='blue')
-    #     # plt.plot(range(len(Alex)), Alex, color='red')
-    #     plt.legend(["CMV", "Alex"])
-    #     plt.xticks(range(len(CMV)), labels_CMV, rotation='vertical')
-    #     plt.title('Histogram of the data classified by type')
-    #     plt.show()
-    # except :
-    #     print ("Not selected")
-
-    # Affichage de bars (plus "propre")
+    print (info)
 
     width = 0.2  # the width of the bars
     x = np.arange(len(types))  # the label locations
     fig, ax = plt.subplots()
     rects = []
-    placement = - width*(len(places)-1)/2
+    placement = - width*(len(places) - 1)/2
     for i in range(len(places)):
         rects += [ax.bar(x + placement, info[places[i]], width, label=places[i])]
         ax.bar_label(rects[(len(rects)-1)], padding=3)
         placement += width
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
-    ax.set_ylabel('Scores')
-    ax.set_title('Scores by group and gender')
+    ax.set_ylabel('Number of images')
+    ax.set_title('Number of images divised by location and sub-divised by type')
     ax.set_xticks(x)
     ax.set_xticklabels(types)
     ax.legend()
@@ -226,7 +218,7 @@ def menu(*list_of_menu_buttons):
     elif (val == 2):
         recursive_search_and_JSON_file_generator(".", 0)
     elif (val == 3):
-        data_JSON = JSON_files_join(".")
+        data_JSON += JSON_files_join(".")
     elif (val == 4):
         JSON_categories_plot (data_JSON)
     elif (val == 5):
@@ -257,6 +249,8 @@ def arguments_2_lists_of_integers (arguments) :
     return (arguments)
 
 def main (arguments) :
+    global data_JSON
+    data_JSON = []
     menu(arguments) # call the menu which is a switch-case of functions.
 
 if (__name__ == "__main__"):
