@@ -163,8 +163,6 @@ def JSON_categories_plot (JSON_file):
     info["TOTAL"] = tableau
     places += ["TOTAL"]
 
-    print (info)
-
     width = 0.2  # the width of the bars
     x = np.arange(len(types))  # the label locations
     fig, ax = plt.subplots()
@@ -188,14 +186,16 @@ def print_menu () :
     '''
         It prints the menu.
     '''
-    print ("""\n\n Menu. Please, make a choice (or a sequence of choices).
+    print ("""\n Menu. Please, make a choice (or a sequence of choices).
                     \t1 - create JSON files which contain info for each directory found recursively from . (overwrite existing JSON files)
                     \t2 - create JSON files which contain info for each directory found recursively from . (if it does not already exist) 
                     \t3 - get all JSON files found recursively from .
                     \t4 - plot statistics from the JSON files.
                     \t5 - print the JSON files found by the third menu.
                     \t6 - print the absolute path of the script.
-                    \t7 - END of the program.
+                    \t7 - print the directories of the current working directory
+                    \t8 - change the directory
+                    \t9 - END of the program.
                 """)
 
 def menu(*list_of_menu_buttons):
@@ -206,12 +206,13 @@ def menu(*list_of_menu_buttons):
     '''
     list_of_menu_buttons = list_of_menu_buttons[0] # enable to convert optional arguments of the function
     if list_of_menu_buttons != []: # Is there a sequence of executions to do ?
+        list_of_menu_buttons = arguments_2_list_pop_int(list_of_menu_buttons) # We convert them to a list of integers if possible
         val = list_of_menu_buttons.pop(0) # read the first element removed
     else : # Menu is printed and we wait the command prompt
         print_menu()
         list_of_menu_buttons = str(input()).split(' ') # We keep the string without spaces
         list_of_menu_buttons = list(list_of_menu_buttons) # We store them in a list
-        list_of_menu_buttons = arguments_2_lists_of_integers(list_of_menu_buttons) # We convert them to a list of integers if possible
+        list_of_menu_buttons = arguments_2_list_pop_int(list_of_menu_buttons) # We convert them to a list of integers if possible
         val = list_of_menu_buttons.pop(0)
     if (val == 1):
         recursive_search_and_JSON_file_generator(".", 1)
@@ -226,20 +227,30 @@ def menu(*list_of_menu_buttons):
     elif (val == 6):
         print (os.getcwd())
     elif (val == 7):
+        liste = []
+        for element in os.listdir() :
+            if os.path.isdir(element) :
+                liste.append(element)
+        print (liste)
+    elif (val == 8):
+        try:
+            directory = list_of_menu_buttons.pop(0)
+            os.chdir(directory)
+        except:
+            print ("don't manage to change the directory with : ", directory)
+    elif (val == 9):
         exit ()
     else :
-        print ("Your choice must be an integer between 1 and 7 !")
+        print ("Your choice must be an integer between 1 and 9 !")
     menu(list_of_menu_buttons) # recall the menu at the end of the task.
 
-def arguments_2_lists_of_integers (arguments) :
+def arguments_2_list_pop_int (arguments) :
     '''
-        It tests and converts a list of arguments received by the shell to convert to a
-        list of integers.
+        It tests and converts the first element of the arguments received by the shell into integer
         It raises an exception and exit if an argument is not standard.
     '''
-    try :    
-        for i in range(len(arguments)):
-            arguments[i] = int(arguments[i])
+    try :
+        arguments[0] = int(arguments[0])
     except ValueError:
         print("Could not convert argument to an integer.")
         exit(1)
@@ -259,5 +270,7 @@ if (__name__ == "__main__"):
         It forces python to execute the main fonction automatically.
         It executes the menu with the arguments (converted).
     '''
-    arguments = arguments_2_lists_of_integers(sys.argv[1:])
+    arguments = [] # default value
+    if (sys.argv[1:] != []):
+        arguments = arguments_2_list_pop_int(sys.argv[1:])
     main(arguments)
