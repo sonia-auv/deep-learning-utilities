@@ -42,32 +42,39 @@ def JSON_files_join (path):
                         JSON_files_join += [json.load(f)]
     return (JSON_files_join)
     
-        
 def types_split (directory_name) :
     '''
         It splits the name of the directory to deduct multiple types.
         By convention, the name respects a structure.
     '''
-    pre_defined_types = ['bat', 'vampire', 'wolf']
-    split_name = directory_name.split("_")
-    types = []
-    for word in split_name :
-        if word in pre_defined_types :
-            types.append(word)
-    return (types)
+    try:
+        types = directory_name.split('_')[1]
+        types = types.split('-')
+        return (types)
+    except:
+        return ([])
         
-def decomposition_lieu (directory_name) :
+def date_split (directory_name) :
+    '''
+        It splits the name of the directory to deduct the date.
+        By convention, the name respects a structure.
+    '''
+    try:
+        return (directory_name.split('_')[2])
+    except:
+        return ([])
+        
+def location_split (directory_name) :
     '''
         It splits the name of the directory to deduct the place.
         By convention, the name respects a structure.
     '''
-    pre_defined_types = ['CVM', 'Alex']
-    split_name = directory_name.split("_")
-    types = []
-    for word in split_name :
-        if word in pre_defined_types :
-            types.append(word)
-    return (types)
+    try:
+        locations = directory_name.split('_')[0]
+        locations = locations.split('-')
+        return (locations)
+    except:
+        return ([])
 
 def generator_of_general_structure_JSON_file (directory_name) :
     '''
@@ -80,7 +87,8 @@ def generator_of_general_structure_JSON_file (directory_name) :
     '''
     JSON_file = {"chemin_du_dossier": os.path.join(os.getcwd(), directory_name), \
                 "type" : types_split(directory_name),\
-                "lieu" : decomposition_lieu(directory_name),\
+                "lieu" : location_split(directory_name),\
+                "date" : date_split(directory_name),\
                 "categories" : []}
     return (JSON_file)
 
