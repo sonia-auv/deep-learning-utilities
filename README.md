@@ -1,4 +1,4 @@
-# Project Title
+# Noise Adder (Python 3)
 
 Simple script allowing the user to quickly add noise to a folder of images. The noises can be gaussian, poisson, salt, pepper, salt & pepper or sparkle or even a mix of them all. All the settings are highly customizable.
 
