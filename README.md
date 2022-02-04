@@ -1,67 +1,30 @@
-# Project Title
-One Paragraph of project description goes here
+# Noise Adder (Python 3)
+
+Simple script allowing the user to quickly add noise to a folder of images. The noises can be gaussian, poisson, salt, pepper, salt & pepper or sparkle or even a mix of them all. All the settings are highly customizable.
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+Download NoiseAdder.py and NoiseAdder.ini and make sure both are in the same directory.
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
-
-```
-Give examples
-```
+- Python 3 and the following pip package:
+- Skimage
 
 ### Installing
 
-A step by step series of examples that tell you how to get a development env running
-
-Say what the step will be
-
 ```
-Give the example
+pip install scikit-image
 ```
 
-And repeat
+## Usage
 
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
-
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
+To use this script, modify the .ini files and just run the python files.
+Each of the settings in the .ini file is accompanied with an explanation.
 
 ## Built With
 
-The following packages are examples they should be replaced with project dependencies
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+* [Scikit-Images](https://scikit-image.org/) - The dependency used to generate the noise
 
 ## Versioning
 
